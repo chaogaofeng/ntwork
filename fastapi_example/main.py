@@ -59,7 +59,7 @@ async def client_open(model: models.ClientOpenReqModel):
     try:
         client_mgr.get_client(model.guid)
     except ClientNotExists:
-        create_client(model.guid)
+        client_mgr.create_client(model.guid)
     ret = client_mgr.get_client(model.guid).open(model.smart)
     return response_json(1 if ret else 0)
 
@@ -199,4 +199,4 @@ async def send_gif(model: models.SendMediaReqModel):
 
 
 if __name__ == '__main__':
-    uvicorn.run(app=app)
+    uvicorn.run(app=app, host="0.0.0.0", port=8000)

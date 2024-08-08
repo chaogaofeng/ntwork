@@ -13,7 +13,7 @@ class ClientWeWork(ntwork.WeWork):
 
 class ClientManager(metaclass=Singleton):
     __client_map: Dict[str, ntwork.WeWork] = {}
-    callback_url: str = ""
+    callback_url: str = "http://sg.gushengai.com/prod-api/wechat/callback/msg"
 
     def new_guid(self):
         """
@@ -49,7 +49,7 @@ class ClientManager(metaclass=Singleton):
     def __on_callback(self, wework, message):
         if not self.callback_url:
             return
-
+        print("=============", wework.guid, self.callback_url, message)
         client_message = {
             "guid": wework.guid,
             "message": message
