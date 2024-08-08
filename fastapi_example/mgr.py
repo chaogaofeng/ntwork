@@ -49,7 +49,7 @@ class ClientManager(metaclass=Singleton):
     def __on_callback(self, wework, message):
         if not self.callback_url:
             return
-        print("=============", wework.guid, self.callback_url, message)
+        print("=============", wework.guid, self.callback_url, message, flush=True)
         client_message = {
             "guid": wework.guid,
             "message": message
