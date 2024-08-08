@@ -24,8 +24,9 @@ class ClientManager(metaclass=Singleton):
             if guid not in self.__client_map:
                 return guid
 
-    def create_client(self):
-        guid = self.new_guid()
+    def create_client(self, guid = None):
+        if not guid:
+            guid = self.new_guid()
         wework = ClientWeWork()
         wework.guid = guid
         self.__client_map[guid] = wework
