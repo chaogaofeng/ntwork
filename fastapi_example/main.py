@@ -40,16 +40,7 @@ class catch_exception:
 
 
 client_mgr = ClientManager()
-app = FastAPI(title="NtWork fastapi完整示例",
-              description="NtWork项目地址: https://github.com/smallevilbeast/ntwork")
-
-
-@app.post("/client/create", summary="创建实例", tags=["Client"],
-          response_model=models.ResponseModel)
-@catch_exception()
-async def client_create():
-    guid = client_mgr.create_client()
-    return response_json(1, {"guid": guid})
+app = FastAPI(title="企业微信机器人FastAPI", description="企业微信机器人管理平台")
 
 
 @app.post("/client/open", summary="打开企业微信", tags=["Client"],
@@ -58,10 +49,23 @@ async def client_create():
 async def client_open(model: models.ClientOpenReqModel):
     try:
         client_mgr.get_client(model.guid)
+        return response_json(msg=f"client {model.guid} already open")
     except ClientNotExists:
         client_mgr.create_client(model.guid)
-    ret = client_mgr.get_client(model.guid).open(model.smart)
-    return response_json(1 if ret else 0)
+        ret = client_mgr.get_client(model.guid).open(model.smart)
+        return response_json(1 if ret else 0)
+
+@app.post("/client/quit", summary="退出企业微信", tags=["Client"],
+          response_model=models.ResponseModel)
+@catch_exception()
+async def client_quit(model: models.ClientOpenReqModel):
+    client = client_mgr.get_client(model.guid)
+    if client.login_status:
+        ret = client.__send(ntwork.WeWork.CMD_QUIT)
+        return response_json(1 if ret else 0)
+    else:
+        client_mgr.remove_client(model.guid)
+        return response_json(1)
 
 
 @app.post("/global/set_callback_url", summary="设置接收通知地址", tags=["Global"],

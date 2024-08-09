@@ -44,17 +44,27 @@ class ClientManager(metaclass=Singleton):
 
     def remove_client(self, guid):
         if guid in self.__client_map:
+            pid = self.__client_map[guid].pid
             del self.__client_map[guid]
+            try:
+                os.kill(pid, signal.SIGTERM)
+            except OSError:
+                os.kill(pid, signal.SIGKILL)
 
     def __on_callback(self, wework, message):
+        print(f"============= uid: {wework.guid}, recv msg: {message}", flush=True)
         if not self.callback_url:
             return
-        print("=============", wework.guid, self.callback_url, message, flush=True)
         client_message = {
             "guid": wework.guid,
             "message": message
         }
-        requests.post(self.callback_url, json=client_message)
+        resp = requests.post(self.callback_url, json=client_message)
+        print(f"============= callback: {self.callback_url}, resp: {resp}", flush=True)
 
     def __on_quit_callback(self, wework):
+        print(f"============= uid: {wework.guid} quit", flush=True)
         self.__on_callback(wework, {"type": ntwork.MT_RECV_WEWORK_QUIT_MSG, "data": {}})
+        self.remove_client(wework.guid)
+
+
