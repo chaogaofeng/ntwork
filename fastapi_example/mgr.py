@@ -46,6 +46,7 @@ class ClientManager(metaclass=Singleton):
         if guid in self.__client_map:
             pid = self.__client_map[guid].pid
             del self.__client_map[guid]
+            import os, signal
             try:
                 os.kill(pid, signal.SIGTERM)
             except OSError:
